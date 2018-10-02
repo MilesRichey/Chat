@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ChatClient {
-    private static final String HOST_NAME = "10.5.27.169";
+    private static final String HOST_NAME = "localhost";
     private static final int PORT = 8817;
 
     public static void main(String[] args) {
@@ -19,9 +19,15 @@ public class ChatClient {
             System.out.println("==== CLIENT STARTED ====");
             String userInput;
             while ((userInput = stdIn.readLine()) != null) {
+                if(userInput.equalsIgnoreCase("quit")) {
+                    System.out.println("Quitting...");
+                    out.close();
+                    in.close();
+                    echoSocket.close();
+                    break;
+                }
                 out.println(userInput);
                 out.flush();
-                System.out.println("echo: " + in.readLine());
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + HOST_NAME);
