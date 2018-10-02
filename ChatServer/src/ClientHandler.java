@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientHandler implements Runnable {
-    private static List<InetAddress> users = new ArrayList<>();
+    public static List<InetAddress> users = new ArrayList<>();
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;

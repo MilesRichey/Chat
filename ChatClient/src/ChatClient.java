@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ChatClient {
-    private static final String HOST_NAME = "localhost";
+    private static final String HOST_NAME = "srv.raring.co";
     private static final int PORT = 8817;
 
     public static void main(String[] args) {
