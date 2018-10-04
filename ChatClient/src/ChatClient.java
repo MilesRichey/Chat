@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ChatClient {
-    private static final String HOST_NAME = "srv.raring.co";
+    private static final String HOST_NAME = "localhost";
     private static final int PORT = 8817;
 
     public static void main(String[] args) {
@@ -16,14 +16,12 @@ public class ChatClient {
                 BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
                 BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
         ) {
-            System.out.println("==== CLIENT STARTED ====");
+            echoSocket.setSoTimeout(3000);
+            System.out.println("==== Client Started ====");
             String userInput;
             while ((userInput = stdIn.readLine()) != null) {
                 if(userInput.equalsIgnoreCase("quit")) {
                     System.out.println("Quitting...");
-                    out.close();
-                    in.close();
-                    echoSocket.close();
                     break;
                 }
                 out.println(userInput);
