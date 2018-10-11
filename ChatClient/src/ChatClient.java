@@ -7,36 +7,23 @@ import java.net.UnknownHostException;
 
 public class ChatClient {
     private static final String HOST_NAME = "localhost";
-    private static final String IDENTIFIER = "comp1";
     private static final int PORT = 8817;
-
-    public static void main(String[] args) {
+    private PrintWriter out;
+    private Socket echoSocket;
+    public void sendMessage(String msg) {
+        out.println(msg);
+    }
+    public ChatClient(String id) {
         try {
-            Socket echoSocket = new Socket(HOST_NAME, PORT);
-            PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
-            out.println("id:" + IDENTIFIER);
+            this.echoSocket = new Socket(HOST_NAME, PORT);
+            this.out = new PrintWriter(echoSocket.getOutputStream(), true);
+            out.println("id:" + id);
             new Thread(() -> {
                 try {
                     String serverInput;
                     BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
                     while ((serverInput = in.readLine()) != null) {
                         System.out.println(serverInput);
-                    }
-                } catch(IOException ex) {
-                    ex.printStackTrace();
-                }
-            }).start();
-            new Thread(() -> {
-                try {
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-                    String userInput;
-                    while ((userInput = stdIn.readLine()) != null) {
-                        if (userInput.equalsIgnoreCase("quit")) {
-                            System.out.println("Quitting...");
-                            break;
-                        } else {
-                            out.println(userInput);
-                        }
                     }
                 } catch(IOException ex) {
                     ex.printStackTrace();
