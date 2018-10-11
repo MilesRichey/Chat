@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientHandler extends Thread {
-    public static List<InetAddress> users = new ArrayList<>();
     private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
+    private String identifier;
+    private boolean active = false;
     public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
         try {
@@ -22,19 +23,33 @@ public class ClientHandler extends Thread {
             ex.printStackTrace();
         }
     }
+    public void sendMessage(String msg) {
+        out.println(msg);
+    }
+    public String getIdentifier() {
+        return this.identifier;
+    }
     @Override
     public void run() {
         try {
-            users.add(clientSocket.getInetAddress());
             System.out.println("== Client Accepted(IP: " + clientSocket.getInetAddress().getHostAddress() + ") ==");
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                out.println(inputLine);
-                System.out.println("Received input: " + inputLine);
+                if(active) {
+                    for (ClientHandler ch : ChatServer.USERS) {
+                        //Relaying message to each individual client
+                        ch.sendMessage(this.getIdentifier() + ":" + inputLine);
+                    }
+                } else {
+                    if(inputLine.startsWith("id:")) {
+                        this.identifier = inputLine.split("id:")[1];
+                        this.active = true;
+                    }
+                }
             }
         } catch(SocketException ex) {
             System.out.println(clientSocket.getInetAddress().getHostAddress() + " has disconnected");
-            users.remove(clientSocket.getInetAddress());
+            ChatServer.USERS.remove(this);
         } catch(IOException ex) {
             ex.printStackTrace();
         } finally {
