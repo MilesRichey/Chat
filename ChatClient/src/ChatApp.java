@@ -1,8 +1,6 @@
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,13 +14,15 @@ public class ChatApp {
     private static ChatClient cli;
     private static ListView<String> chatHistoryView = new ListView<>();
     private static ObservableList<String> chatHistory = FXCollections.observableArrayList();
+
     //https://docs.oracle.com/javafx/2/ui_controls/list-view.htm
-    public static void updateChat(String user, String msg) {
+    public static void updateChat(String msg) {
         Platform.runLater(() -> {
-            chatHistory.add(String.format("%s: %s", user, msg));
+            chatHistory.add(msg);
             chatHistoryView.setItems(chatHistory);
         });
     }
+
     public static void start(String ip, String port, String username) {
         // Initialize the ChatClient
         cli = new ChatClient(ip, port, username);
@@ -46,8 +46,8 @@ public class ChatApp {
         Button btn = new Button("Send");
         TextField msgField = new TextField();
         msgField.setOnKeyReleased((e) -> {
-            if(e.getCode().equals(KeyCode.ENTER)) {
-                 btn.fire();
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                btn.fire();
             }
         });
         grid.add(msgField, 0, 1);
@@ -56,7 +56,7 @@ public class ChatApp {
         btn.setOnAction((e) -> {
             //System.out.println(msgField.getText());
             String msg = msgField.getText();
-            if(msg != null && msg.length() > 0) {
+            if (msg != null && msg.length() > 0) {
                 cli.sendMessage(msgField.getText());
                 msgField.setText("");
             }

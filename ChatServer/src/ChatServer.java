@@ -1,17 +1,13 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ChatServer {
     private static final int PORT = 8817;
-    private static boolean RUNNING = true;
     public static List<ClientHandler> USERS = new ArrayList<>();
+    private static boolean RUNNING = true;
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
@@ -23,7 +19,7 @@ public class ChatServer {
             return;
         }
         System.out.printf("Listening for connections on %s:%d...\n", serverSocket.getInetAddress().getHostAddress(), PORT);
-        while(RUNNING) {
+        while (RUNNING) {
             Socket client;
             try {
                 client = serverSocket.accept();
@@ -33,7 +29,7 @@ public class ChatServer {
                 continue;
             }
             ChatServer.USERS.add(new ClientHandler(client));
-            ChatServer.USERS.get(USERS.size()-1).start();
+            ChatServer.USERS.get(USERS.size() - 1).start();
         }
     }
 }

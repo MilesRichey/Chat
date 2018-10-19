@@ -12,10 +12,6 @@ public class ChatClient {
     private PrintWriter out;
     private Socket echoSocket;
 
-    public void sendMessage(String msg) {
-        out.println(msg);
-    }
-
     public ChatClient(String host, String port, String id) {
         this.hostName = host;
         this.hostPort = Integer.parseInt(port);
@@ -30,9 +26,13 @@ public class ChatClient {
                     while ((serverInput = in.readLine()) != null) {
                         System.out.println(serverInput);
                         String[] splitChat = serverInput.split(":");
+                        if(splitChat.length == 1) { // Server message
+                            ChatApp.updateChat(splitChat[0]);
+                            continue;
+                        }
                         String user = splitChat[0];
                         String msg = splitChat[1];
-                        ChatApp.updateChat(user, msg);
+                        ChatApp.updateChat(String.format("%s: %s", user, msg));
                     }
                 } catch (SocketException ex) {
                     System.err.println("Socket Error, this is normal if in the process of exiting");
@@ -47,6 +47,10 @@ public class ChatClient {
             System.err.println("Couldn't get I/O for the connection to " + hostName);
             System.exit(1);
         }
+    }
+
+    public void sendMessage(String msg) {
+        out.println(msg);
     }
 
     void stop() {
