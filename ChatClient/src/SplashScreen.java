@@ -8,6 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -32,6 +34,14 @@ public class SplashScreen extends Application {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
+
+        Button btn = new Button("Connect");
+        EventHandler<KeyEvent> onEnter = (KeyEvent e) -> {
+            if(e.getCode().equals(KeyCode.ENTER)) {
+                btn.fire();
+            }
+        };
+
         // Welcome header text
         Text scenetitle = new Text("Welcome");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -42,6 +52,8 @@ public class SplashScreen extends Application {
         grid.add(ipLabel, 0, 1);
 
         TextField ipField = new TextField();
+        ipField.setPromptText("127.0.0.1:8217");
+        ipField.setOnKeyReleased(onEnter);
         grid.add(ipField, 1, 1);
 
         //Username Field
@@ -49,19 +61,23 @@ public class SplashScreen extends Application {
         grid.add(userLabel, 0, 2);
 
         TextField userField = new TextField();
+        userField.setPromptText("Default User");
+        userField.setOnKeyReleased(onEnter);
         grid.add(userField, 1, 2);
 
         // Connect Button
-        Button btn = new Button("Connect");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(btn);
         btn.setOnAction((e) -> {
             primaryStage.hide();
-            String ip = ipField.getText().split(":")[0];
-            String port = ipField.getText().split(":")[1];
+            String[] ipSplit = ipField.getText().split(":");
+            // Default: localhost:8817, Default User
+            String ip = ipSplit[0].length() == 0 ? "127.0.0.1" : ipSplit[0];
+            String port = ipSplit.length > 1 ? ipField.getText().split(":")[1] : "8817";
             String user = userField.getText();
-            System.out.printf("{'ip':'%s', 'port':'%s', 'user':'%s'}", ip, port, user);
+            user = user == null || user.length() == 0 ? "Default User" : user;
+            System.out.printf("{'ip':'%s', 'port':'%s', 'user':'%s'}\n", ip, port, user);
             ChatApp.start(ip, port, user);
         });
         grid.add(hbBtn, 1, 4);

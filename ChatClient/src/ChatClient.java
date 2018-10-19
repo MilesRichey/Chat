@@ -3,19 +3,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class ChatClient {
-    private static final String HOST_NAME = "localhost";
-    private static final int PORT = 8817;
+    private static String hostName = "localhost";
+    private static int hostPort = 8817;
     private PrintWriter out;
     private Socket echoSocket;
+
     public void sendMessage(String msg) {
         out.println(msg);
     }
-    public ChatClient(String id) {
+
+    public ChatClient(String host, String port, String id) {
+        this.hostName = host;
+        this.hostPort = Integer.parseInt(port);
         try {
-            this.echoSocket = new Socket(HOST_NAME, PORT);
+            this.echoSocket = new Socket(hostName, hostPort);
             this.out = new PrintWriter(echoSocket.getOutputStream(), true);
             out.println("id:" + id);
             new Thread(() -> {
@@ -24,17 +29,33 @@ public class ChatClient {
                     BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
                     while ((serverInput = in.readLine()) != null) {
                         System.out.println(serverInput);
+                        String[] splitChat = serverInput.split(":");
+                        String user = splitChat[0];
+                        String msg = splitChat[1];
+                        ChatApp.updateChat(user, msg);
                     }
-                } catch(IOException ex) {
+                } catch (SocketException ex) {
+                    System.err.println("Socket Error, this is normal if in the process of exiting");
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }).start();
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + HOST_NAME);
+            System.err.println("Don't know about host " + hostName);
             System.exit(1);
         } catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " + HOST_NAME);
+            System.err.println("Couldn't get I/O for the connection to " + hostName);
             System.exit(1);
         }
+    }
+
+    void stop() {
+        try {
+            echoSocket.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
